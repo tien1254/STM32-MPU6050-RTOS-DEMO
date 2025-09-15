@@ -22,6 +22,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h \
+ ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h \
  D:/2_STM32/bai_tap_vv/12_MPU6050/Core/FreeRTOS/include/FreeRTOS.h \
@@ -40,7 +41,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  D:/2_STM32/bai_tap_vv/12_MPU6050/Core/FreeRTOS/include/mpu_wrappers.h \
  D:/2_STM32/bai_tap_vv/12_MPU6050/Core/FreeRTOS/include/task.h \
  D:/2_STM32/bai_tap_vv/12_MPU6050/Core/FreeRTOS/include/list.h \
- ../Core/Inc/fonts.h ../Core/Inc/ssd1306.h ../Core/Inc/fonts.h
+ ../Core/Inc/fonts.h ../Core/Inc/ssd1306.h ../Core/Inc/fonts.h \
+ ../Core/Inc/nrf24l01.h ../Core/Inc/main.h
 ../Core/Inc/main.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:
 ../Core/Inc/stm32f1xx_hal_conf.h:
@@ -65,6 +67,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h:
+../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h:
 D:/2_STM32/bai_tap_vv/12_MPU6050/Core/FreeRTOS/include/FreeRTOS.h:
@@ -86,3 +89,5 @@ D:/2_STM32/bai_tap_vv/12_MPU6050/Core/FreeRTOS/include/list.h:
 ../Core/Inc/fonts.h:
 ../Core/Inc/ssd1306.h:
 ../Core/Inc/fonts.h:
+../Core/Inc/nrf24l01.h:
+../Core/Inc/main.h:

@@ -29,10 +29,18 @@
 #include <stdio.h>
 #include "fonts.h"
 #include "ssd1306.h"
+#include "nrf24l01.h"
+//===========================================
+
+#define SIZE_RX_BUF 8
+uint8_t rx_data[SIZE_RX_BUF];
+uint8_t rxAddr[] = { 0xEA, 0xDD, 0xCC, 0xBB, 0xAA };
+nrf24 nrfRx;
+
+
+//=============================================
 /* Biến toàn cục lưu giá trị góc */
-float pitch_val, roll_val,yaw_val;// Tích phân từ gyro Z
-
-
+float pitch_val, roll_val, yaw_val; // Tích phân từ gyro Z
 
 /* Biến lưu dữ liệu gia tốc và gyro */
 float AX, AY, AZ, GX, GY, GZ;
@@ -83,7 +91,10 @@ float R_measure = 0.03f;    // noise đo (từ cảm biến accel)
 I2C_HandleTypeDef hi2c1;
 I2C_HandleTypeDef hi2c2;
 
+SPI_HandleTypeDef hspi1;
+
 /* USER CODE BEGIN PV */
+//================================================================================
 float Kalman_getAngle(Kalman_t *Kalman, float newAngle, float newRate, float dt) {
 	/* ======= Bước 1: Dự đoán (Predict) ======= */
 	Kalman->rate = newRate - Kalman->bias;
@@ -126,10 +137,12 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_I2C2_Init(void);
+static void MX_SPI1_Init(void);
 /* USER CODE BEGIN PFP */
 void TaskMPU6050_Read(void *argument);
 void TaskOLED_Display(void *argument);
-
+void TaskNRF_RX(void *argument);
+//==========================================================
 void MPU6050Init(void);
 void MPU6050ReadA(void);
 void MPU6050ReadG(void);
@@ -174,17 +187,32 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   MX_I2C2_Init();
+  MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
+	//=============================================================================
+	nrfRx.hSPIx   = &hspi1;
+	nrfRx.CE_port =CE_GPIO_Port;
+	nrfRx.CE_pin  = CE_Pin;
+	nrfRx.CSN_port= CSN_GPIO_Port;
+	nrfRx.CSN_pin = CSN_Pin;
+
+	nrfRx.hSPIx = &hspi1;
+	NRF24_Init(&nrfRx);
+	NRF24_Set_DataRate(&nrfRx, _250KBS);
+	NRF24_Set_PALevel(&nrfRx, HIGH);
+	NRF24_Set_RxPipe(&nrfRx, rxAddr, 0, SIZE_RX_BUF);
+	NRF24_Set_Mode(&nrfRx, RX_MODE);
+	//=========================================================================
 	vConfigureTimerForRunTimeStats();
 	SEGGER_SYSVIEW_Conf(); /* Thêm vào nếu sử dụng SEGGER SystemView!*/
 	MPU6050Init();
 	xTaskCreate(TaskMPU6050_Read, "MPU6050", 256, NULL, 2, NULL);
-
 	xTaskCreate(TaskOLED_Display, "OLED", 256, NULL, 1, NULL);
+	xTaskCreate(TaskNRF_RX, "NRF_RX", 256, NULL, 3, NULL); // priority cao hơn OLED
 	// Bắt đầu RTOS
 	/* Tạo task khởi động SystemView */
 	xTaskCreate(vSystemViewStartTask, "SysViewStart", 256, NULL,
-			configMAX_PRIORITIES - 1, NULL);
+	configMAX_PRIORITIES - 1, NULL);
 
 	vTaskStartScheduler();
   /* USER CODE END 2 */
@@ -308,25 +336,86 @@ static void MX_I2C2_Init(void)
 }
 
 /**
+  * @brief SPI1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_SPI1_Init(void)
+{
+
+  /* USER CODE BEGIN SPI1_Init 0 */
+
+  /* USER CODE END SPI1_Init 0 */
+
+  /* USER CODE BEGIN SPI1_Init 1 */
+
+  /* USER CODE END SPI1_Init 1 */
+  /* SPI1 parameter configuration*/
+  hspi1.Instance = SPI1;
+  hspi1.Init.Mode = SPI_MODE_MASTER;
+  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi1.Init.NSS = SPI_NSS_SOFT;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
+  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi1.Init.CRCPolynomial = 10;
+  if (HAL_SPI_Init(&hspi1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN SPI1_Init 2 */
+
+  /* USER CODE END SPI1_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
 /* USER CODE BEGIN MX_GPIO_Init_1 */
 /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, CE_Pin|CSN_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : PC13 */
+  GPIO_InitStruct.Pin = GPIO_PIN_13;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : CE_Pin CSN_Pin */
+  GPIO_InitStruct.Pin = CE_Pin|CSN_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
+//====================================SystemView=================================
 void vSystemViewStartTask(void *argument) {
 	// THÊM DÒNG NÀY: Chờ 1 giây để J-Link và SystemView trên PC sẵn sàng
 	vTaskDelay(pdMS_TO_TICKS(100));
@@ -359,6 +448,7 @@ void vConfigureTimerForRunTimeStats(void) {
 unsigned long ulGetRunTimeCounterValue(void) {
 	return TIM2->CNT; // Trả về giá trị đếm
 }
+//=======================================MPU6050Init=======================================
 void MPU6050Init(void) {
 	// Đọc thanh ghi WHO_AM_I (0x75), kết quả phải là 0x68
 	HAL_I2C_Mem_Read(&hi2c1, 0xD0, 0x75, I2C_MEMADD_SIZE_8BIT, &check, 1, 1000);
@@ -385,7 +475,7 @@ void MPU6050Init(void) {
 				1000);
 	}
 }
-
+//====================================ReadG=======================================
 void MPU6050ReadG(void) {
 	uint8_t dataG[6];
 	// Đọc 6 byte từ thanh ghi GYRO_XOUT_H (0x43)
@@ -401,7 +491,7 @@ void MPU6050ReadG(void) {
 	GY = (float) gy / 131.0;
 	GZ = (float) gz / 131.0;
 }
-
+//================================ReadA================================
 void MPU6050ReadA(void) {
 	uint8_t dataA[6];
 	// Đọc 6 byte từ thanh ghi ACCEL_XOUT_H (0x3B)
@@ -416,7 +506,7 @@ void MPU6050ReadA(void) {
 	AY = (float) ay / 16384.0;
 	AZ = (float) az / 16384.0;
 }
-
+//==================================TaskMPU6050==========================
 void TaskMPU6050_Read(void *argument) {
 	lastTime = HAL_GetTick();
 
@@ -447,39 +537,53 @@ void TaskMPU6050_Read(void *argument) {
 		vTaskDelay(pdMS_TO_TICKS(10));
 	}
 }
-void TaskOLED_Display(void *argument)
+//======================================TaskOLED_Display=======================
+void TaskOLED_Display(void *argument) {
+	SSD1306_Init();
+	char buf[32];
+
+	for (;;) {
+		// Xóa màn hình
+		SSD1306_Clear();
+
+		// In Pitch
+		sprintf(buf, "Pitch: %.2f", pitch_val);
+		SSD1306_GotoXY(0, 0);
+		SSD1306_Puts(buf, &Font_7x10, 1);
+
+		// In Roll
+		sprintf(buf, "Roll : %.2f", roll_val);
+		SSD1306_GotoXY(0, 12);
+		SSD1306_Puts(buf, &Font_7x10, 1);
+
+		// In Yaw
+		sprintf(buf, "Yaw  : %.2f", yaw_val);
+		SSD1306_GotoXY(0, 24);
+		SSD1306_Puts(buf, &Font_7x10, 1);
+
+		// Cập nhật màn hình
+		SSD1306_UpdateScreen();
+
+		// Delay 200ms
+		vTaskDelay(pdMS_TO_TICKS(200));
+	}
+}
+//===================================TaskNRF_RX=======================================
+void TaskNRF_RX(void *argument)
 {
-    SSD1306_Init();
-    char buf[32];
-
-    for (;;)
+    for(;;)
     {
-        // Xóa màn hình
-        SSD1306_Clear();
+        // Nếu có dữ liệu từ TX gửi sang
+        if (NRF24_Available(&nrfRx, 0)) {
+            NRF24_Receive(&nrfRx, rx_data, SIZE_RX_BUF);
 
-        // In Pitch
-        sprintf(buf, "Pitch: %.2f", pitch_val);
-        SSD1306_GotoXY(0, 0);
-        SSD1306_Puts(buf, &Font_7x10, 1);
+            // Chỉ đảo LED PC13
+            HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+        }
 
-        // In Roll
-        sprintf(buf, "Roll : %.2f", roll_val);
-        SSD1306_GotoXY(0, 12);
-        SSD1306_Puts(buf, &Font_7x10, 1);
-
-        // In Yaw
-        sprintf(buf, "Yaw  : %.2f", yaw_val);
-        SSD1306_GotoXY(0, 24);
-        SSD1306_Puts(buf, &Font_7x10, 1);
-
-        // Cập nhật màn hình
-        SSD1306_UpdateScreen();
-
-        // Delay 200ms
-        vTaskDelay(pdMS_TO_TICKS(200));
+        vTaskDelay(pdMS_TO_TICKS(10)); // 100Hz
     }
 }
-
 
 
 /* USER CODE END 4 */
