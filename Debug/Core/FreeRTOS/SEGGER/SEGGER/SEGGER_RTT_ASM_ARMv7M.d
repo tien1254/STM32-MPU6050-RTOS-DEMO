@@ -1,0 +1,6 @@
+Core/FreeRTOS/SEGGER/SEGGER/SEGGER_RTT_ASM_ARMv7M.o: \
+ ../Core/FreeRTOS/SEGGER/SEGGER/SEGGER_RTT_ASM_ARMv7M.S \
+ ../Core/FreeRTOS/SEGGER/SEGGER/SEGGER_RTT.h \
+ D:/2_STM32/bai_tap_vv/12_MPU6050/SeggerSystemView/Config/SEGGER_RTT_Conf.h
+../Core/FreeRTOS/SEGGER/SEGGER/SEGGER_RTT.h:
+D:/2_STM32/bai_tap_vv/12_MPU6050/SeggerSystemView/Config/SEGGER_RTT_Conf.h:
