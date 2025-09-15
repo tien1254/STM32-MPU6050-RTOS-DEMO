@@ -1,4 +1,4 @@
-Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
+Core/Src/ssd1306.o: ../Core/Src/ssd1306.c ../Core/Inc/ssd1306.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h \
  ../Core/Inc/stm32f1xx_hal_conf.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h \
@@ -24,24 +24,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h \
- D:/2_STM32/bai_tap_vv/12_MPU6050/Core/FreeRTOS/include/FreeRTOS.h \
- ../Core/Inc/FreeRTOSConfig.h \
- D:/2_STM32/bai_tap_vv/12_MPU6050/SeggerSystemView/SEGGER/SEGGER_SYSVIEW.h \
- D:/2_STM32/bai_tap_vv/12_MPU6050/SeggerSystemView/SEGGER/SEGGER.h \
- D:/2_STM32/bai_tap_vv/12_MPU6050/SeggerSystemView/Config/Global.h \
- D:/2_STM32/bai_tap_vv/12_MPU6050/SeggerSystemView/SEGGER/SEGGER_SYSVIEW_ConfDefaults.h \
- D:/2_STM32/bai_tap_vv/12_MPU6050/SeggerSystemView/Config/SEGGER_SYSVIEW_Conf.h \
- D:/2_STM32/bai_tap_vv/12_MPU6050/SeggerSystemView/Config/SEGGER_RTT_Conf.h \
- D:/2_STM32/bai_tap_vv/12_MPU6050/SeggerSystemView/FreeRTOSV11/SEGGER_SYSVIEW_FreeRTOS.h \
- D:/2_STM32/bai_tap_vv/12_MPU6050/Core/FreeRTOS/include/projdefs.h \
- D:/2_STM32/bai_tap_vv/12_MPU6050/Core/FreeRTOS/include/portable.h \
- D:/2_STM32/bai_tap_vv/12_MPU6050/Core/FreeRTOS/include/deprecated_definitions.h \
- D:/2_STM32/bai_tap_vv/12_MPU6050/Core/FreeRTOS/portable/GCC/ARM_CM3/portmacro.h \
- D:/2_STM32/bai_tap_vv/12_MPU6050/Core/FreeRTOS/include/mpu_wrappers.h \
- D:/2_STM32/bai_tap_vv/12_MPU6050/Core/FreeRTOS/include/task.h \
- D:/2_STM32/bai_tap_vv/12_MPU6050/Core/FreeRTOS/include/list.h \
- ../Core/Inc/fonts.h ../Core/Inc/ssd1306.h ../Core/Inc/fonts.h
-../Core/Inc/main.h:
+ ../Core/Inc/fonts.h
+../Core/Inc/ssd1306.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:
 ../Core/Inc/stm32f1xx_hal_conf.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h:
@@ -67,22 +51,4 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h:
-D:/2_STM32/bai_tap_vv/12_MPU6050/Core/FreeRTOS/include/FreeRTOS.h:
-../Core/Inc/FreeRTOSConfig.h:
-D:/2_STM32/bai_tap_vv/12_MPU6050/SeggerSystemView/SEGGER/SEGGER_SYSVIEW.h:
-D:/2_STM32/bai_tap_vv/12_MPU6050/SeggerSystemView/SEGGER/SEGGER.h:
-D:/2_STM32/bai_tap_vv/12_MPU6050/SeggerSystemView/Config/Global.h:
-D:/2_STM32/bai_tap_vv/12_MPU6050/SeggerSystemView/SEGGER/SEGGER_SYSVIEW_ConfDefaults.h:
-D:/2_STM32/bai_tap_vv/12_MPU6050/SeggerSystemView/Config/SEGGER_SYSVIEW_Conf.h:
-D:/2_STM32/bai_tap_vv/12_MPU6050/SeggerSystemView/Config/SEGGER_RTT_Conf.h:
-D:/2_STM32/bai_tap_vv/12_MPU6050/SeggerSystemView/FreeRTOSV11/SEGGER_SYSVIEW_FreeRTOS.h:
-D:/2_STM32/bai_tap_vv/12_MPU6050/Core/FreeRTOS/include/projdefs.h:
-D:/2_STM32/bai_tap_vv/12_MPU6050/Core/FreeRTOS/include/portable.h:
-D:/2_STM32/bai_tap_vv/12_MPU6050/Core/FreeRTOS/include/deprecated_definitions.h:
-D:/2_STM32/bai_tap_vv/12_MPU6050/Core/FreeRTOS/portable/GCC/ARM_CM3/portmacro.h:
-D:/2_STM32/bai_tap_vv/12_MPU6050/Core/FreeRTOS/include/mpu_wrappers.h:
-D:/2_STM32/bai_tap_vv/12_MPU6050/Core/FreeRTOS/include/task.h:
-D:/2_STM32/bai_tap_vv/12_MPU6050/Core/FreeRTOS/include/list.h:
-../Core/Inc/fonts.h:
-../Core/Inc/ssd1306.h:
 ../Core/Inc/fonts.h:
